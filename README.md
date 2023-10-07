@@ -1,6 +1,62 @@
 # DeadLock Avoidance
 
+Deadlock avoidance requires that the system has some additional a priori information regarding the resources that each process will request. Using this information, the system can decide whether or not to allocate a resource to a process at a particular point in time, in order to ensure that the system will remain in a safe state. There are several methods to achieve deadlock avoidance:
+
+1. **Banker's Algorithm**:
+    - This algorithm is used in a system where the number and types of resources are known in advance. 
+    - It keeps track of all resource allocation and process states to ensure that the system will not enter an unsafe state which could lead to deadlock.
+    - It's more suitable for systems with a small number of processes and resources due to its complexity.
+
+2. **Resource Allocation Graph (RAG)**:
+    - The Resource Allocation Graph algorithm is utilized when resources have only a single instance.
+    - It uses a directed graph to keep track of all the resources and processes in the system, as well as the requests and allocations of resources.
+    - A cycle in the graph is used as an indication of deadlock.
+
+Each mechanism is suited for different scenarios depending on the nature and complexity of the system, the number and types of resources, and the requirements of the processes. For instance, Banker's Algorithm would be more suitable in a controlled environment with a known set of resources and processes, while Resource Ordering or Incremental Resource Allocation might be better suited for more dynamic or complex systems.
+
+
 ### 1) Banker's Algorithm Simulator
+
+## Banker's Algorithm explained in more details
+
+Let's consider a simplified example where we have three processes (P0, P1, and P2) and three types of resources (A, B, and C). We'll illustrate how the Banker's Algorithm would work with these processes and resources.
+
+Here's the initial state of the system:
+
+|      | Max Demand | Allocation | Need  | Available |
+|------|------------|------------|-------|-----------|
+|      | A  B  C     | A  B  C     | A  B  C  | A  B  C    |
+| P0   | 7  5  3     | 0  1  0     | 7  4  3  | 3  3  2    |
+| P1   | 3  2  2     | 2  0  0     | 1  2  2  |           |
+| P2   | 9  0  2     | 3  0  2     | 6  0  0  |           |
+
+1. **Max Demand**: The maximum number of instances of each resource type that a process may need.
+2. **Allocation**: The number of instances of each resource type currently allocated to a process.
+3. **Need**: The remaining resource need for each process (`Need = Max Demand - Allocation`).
+4. **Available**: The number of instances of each resource type currently available in the system.
+
+Now, suppose process P1 requests one more instance of resource B. To check whether this request can be granted, the Banker's Algorithm performs a provisional allocation and checks for safety.
+
+Provisional Allocation:
+
+|      | Allocation | Need  | Available |
+|------|------------|-------|-----------|
+|      | A  B  C     | A  B  C  | A  B  C    |
+| P0   | 0  1  0     | 7  4  3  | 3  2  2    |
+| P1   | 2  1  0     | 1  1  2  |           |
+| P2   | 3  0  2     | 6  0  0  |           |
+
+Now we'll check for a safe sequence:
+
+- **P2** can be the first process in the sequence since its current needs can be satisfied by the available resources.
+- Once P2 completes, it releases its resources, making the available resources A=6, B=2, C=4.
+- Now, **P1** can proceed since its current needs can be satisfied by the available resources.
+- Once P1 completes, it releases its resources, making the available resources A=8, B=3, C=4.
+- Finally, **P0** can proceed with the now available resources.
+
+So, a safe sequence (P2, P1, P0) has been found, indicating that the system is in a safe state after the provisional allocation. Therefore, the request by process P1 can be granted.
+
+This simplified example demonstrates how the Banker's Algorithm checks for safety before granting a resource request, ensuring that the system remains deadlock-free.
 
 ## Overview
 The Banker's Algorithm is a renowned resource allocation and deadlock avoidance algorithm used in operating system design to prevent deadlock by evaluating resource requests against available resources. This simulator aims to demonstrate the Banker's Algorithm with support for `N` processes and `M` resource types (with a constraint of `N < 10` and `M < 10`).
